@@ -10,12 +10,20 @@ import org.testng.annotations.Test;
 import pages.StudentRegistrationForm;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 public class StudentRegistrationSetup {
     WebDriver driver;
     StudentRegistrationForm studentRegistrationForm;
+    Properties prop;
+
+    public void StudentRegistrationSetup() throws IOException {
+
+    }
+
 
     @Parameters("browser")
     @BeforeTest
@@ -35,26 +43,38 @@ public class StudentRegistrationSetup {
 
     @Test
     public void testForm() throws IOException {
+        prop = new Properties();
+        FileInputStream filePath = new FileInputStream("./src/main/resources/data/testdata.properties");
+        prop.load(filePath);
         studentRegistrationForm = new StudentRegistrationForm(driver);
-        studentRegistrationForm.verifyPage();
-        studentRegistrationForm.enterFirstName("Geethu");
-        studentRegistrationForm.enterLastName("Mohan");
-        studentRegistrationForm.enterEmailId("test123@gmail.com");
+        studentRegistrationForm.verifyPage(prop.getProperty("Title"));
+        studentRegistrationForm.enterFirstName(prop.getProperty("FirstName"));
+        studentRegistrationForm.enterLastName(prop.getProperty("LastName"));
+        studentRegistrationForm.enterEmailId(prop.getProperty("EmailId"));
         studentRegistrationForm.selectGender();
-        studentRegistrationForm.enterMobNumber("9999555005");
-        studentRegistrationForm.enterSubject("Testing");
+        studentRegistrationForm.enterMobNumber(prop.getProperty("MobNumber"));
+        studentRegistrationForm.enterSubject(prop.getProperty("Subject"));
         studentRegistrationForm.selectAllHobbies();
         File file = new File("./src/main/resources/upload/pic.jpg");
         studentRegistrationForm.fileUpload(file.getAbsolutePath());
-        studentRegistrationForm.enterAddress("Puthuparambil House, Pathanamthitta, Kerala");
-        studentRegistrationForm.selectState("Haryana");
-        studentRegistrationForm.selectCity("Karnal");
+        studentRegistrationForm.enterAddress(prop.getProperty("Address"));
+        studentRegistrationForm.selectState(prop.getProperty("State"));
+        studentRegistrationForm.selectCity(prop.getProperty("City"));
         studentRegistrationForm.submitButton();
+        studentRegistrationForm.verifySuccessMessage(prop.getProperty("SuccessMessage"));
         studentRegistrationForm.takeScreenshot("./src/main/resources/screenshot/screenshot.png");
     }
 
+    @Test
+    public void validateRegistrationForm() throws IOException {
+        String name = prop.getProperty("FirstName") + " " + prop.getProperty("LastName");
+        String state_city = prop.getProperty("State") + " " + prop.getProperty("City");
+        studentRegistrationForm.verifyRegistrationSuccessForm(name,prop.getProperty("EmailId"),prop.getProperty("Gender"),prop.getProperty("MobNumber")
+                ,prop.getProperty("Subject"),prop.getProperty("Hobbies"),prop.getProperty("Picture"),prop.getProperty("Address"),state_city);
+    }
+
     @AfterTest
-    public void closeBroser() {
+    public void closeBrowser() {
         driver.quit();
     }
 

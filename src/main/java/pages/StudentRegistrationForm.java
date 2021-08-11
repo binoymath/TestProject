@@ -37,11 +37,14 @@ public class StudentRegistrationForm {
     @FindBy(id = "userNumber")
     WebElement mobNumber;
 
-    @FindBy(id = "subjectsContainer")
+    @FindBy(id = "subjectsInput")
     WebElement subject;
 
+    @FindBy(id = "hobbiesWrapper")
+    WebElement hobbyWrapper;
+
     @FindBy(xpath = "//input[@type='checkbox']")
-    private List<WebElement> selectAllHobbies;
+    List<WebElement> selectAllHobbies;
 
     @FindBy(id = "uploadPicture")
     WebElement uploadFile;
@@ -58,36 +61,75 @@ public class StudentRegistrationForm {
     @FindBy(id = "submit")
     WebElement submitButton;
 
+    @FindBy(id = "example-modal-sizes-title-lg")
+    WebElement verifySuccessMsg;
+
+    @FindBy(xpath = "//td[text()='Student Name']/..//td[2]")
+    WebElement verifyStudentName;
+
+    @FindBy(xpath = "//td[text()='Student Email']/..//td[2]")
+    WebElement verifyStudentEmail;
+
+    @FindBy(xpath = "//td[text()='Gender']/..//td[2]")
+    WebElement verifyGender;
+
+    @FindBy(xpath = "//td[text()='Mobile']/..//td[2]")
+    WebElement verifyMobile;
+
+    @FindBy(xpath = "//td[text()='Subjects']/..//td[2]")
+    WebElement verifySubjects;
+
+    @FindBy(xpath = "//td[text()='Hobbies']/..//td[2]")
+    WebElement verifyHobbies;
+
+    @FindBy(xpath = "//td[text()='Picture']/..//td[2]")
+    WebElement verifyPicture;
+
+    @FindBy(xpath = "//td[text()='Address']/..//td[2]")
+    WebElement verifyAddress;
+
+    @FindBy(xpath = "//td[text()='State and City']/..//td[2]")
+    WebElement verifyStateCity;
+
     public StudentRegistrationForm(WebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(driver, this);
     }
 
-    public void verifyPage() {
+    public void verifyPage(String actualTitle) {
         String formName = pageTitle.getText();
-        assertEquals("Student Registration Form", formName);
+        assertEquals(actualTitle, formName);
     }
     public void enterFirstName(String firstname) {
+        assertEquals(true, firstName.isDisplayed());
         firstName.sendKeys(firstname);
     }
     public void enterLastName(String lastname) {
+        assertEquals(true, lastName.isDisplayed());
         lastName.sendKeys(lastname);
     }
     public void enterEmailId(String email_id) {
+        assertEquals(true, emailId.isDisplayed());
         emailId.sendKeys(email_id);
     }
     public void selectGender()
     {
+        assertEquals(false, gender.isSelected());
         Actions act =  new Actions(driver);
         act.moveToElement(gender).click().perform();
     }
     public void enterMobNumber(String number) {
+        assertEquals(true, mobNumber.isDisplayed());
         mobNumber.sendKeys(number);
     }
     public void enterSubject(String sub) {
-        mobNumber.sendKeys(sub);
+        assertEquals(true, subject.isDisplayed());
+        Actions act =  new Actions(driver);
+        act.moveToElement(subject).click().perform();
+        act.moveToElement(subject).sendKeys(sub).sendKeys(Keys.DOWN, Keys.ENTER).perform();
     }
     public void selectAllHobbies() {
+        assertEquals(true, hobbyWrapper.isDisplayed());
         int size = selectAllHobbies.size();
         System.out.println(size);
         for (int i = 0; i<size; i++) {
@@ -96,28 +138,57 @@ public class StudentRegistrationForm {
         }
     }
     public void fileUpload(String url) {
+        assertEquals(true, uploadFile.isDisplayed());
         uploadFile.sendKeys(url);
     }
     public void enterAddress(String address) {
+        assertEquals(true, currentAddress.isDisplayed());
         currentAddress.sendKeys(address);
     }
     public void selectState(String state_arg) {
+        assertEquals(true, selectState.isDisplayed());
         selectState.sendKeys(state_arg);
         selectState.sendKeys(Keys.DOWN, Keys.ENTER);
     }
     public void selectCity(String city_arg) {
+        assertEquals(true, selectCity.isDisplayed());
         selectCity.sendKeys(city_arg);
         selectCity.sendKeys(Keys.DOWN, Keys.ENTER);
-
     }
     public void submitButton() {
         WebDriverWait wait = new WebDriverWait(driver,500);
         wait.until(ExpectedConditions.elementToBeClickable(submitButton));
         ((JavascriptExecutor) driver).executeScript("window.scrollBy(0,500)");
+        assertEquals(true, submitButton.isDisplayed());
         submitButton.click();
     }
     public void takeScreenshot(String filePath) throws IOException {
         File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         FileUtils.copyFile(screenshot, new File(filePath));
+    }
+    public void verifySuccessMessage(String actualMessage) {
+        String message = verifySuccessMsg.getText();
+        assertEquals(actualMessage, message);
+    }
+    public void verifyRegistrationSuccessForm(String studentName, String studentEmail, String gender, String mobile, String subject, String hobbies,
+                                              String picture, String address, String stateCity) {
+        String name = verifyStudentName.getText();
+        assertEquals(studentName, name);
+        String email = verifyStudentEmail.getText();
+        assertEquals(studentEmail, email);
+        String getGender = verifyGender.getText();
+        assertEquals(gender, getGender);
+        String getMobile = verifyMobile.getText();
+        assertEquals(mobile, getMobile);
+        String getSubject = verifySubjects.getText();
+        assertEquals(subject, getSubject);
+        String getHobbies = verifyHobbies.getText();
+        assertEquals(hobbies, getHobbies);
+        String picUrl = verifyPicture.getText();
+        assertEquals(picture, picUrl);
+        String getaddress = verifyAddress.getText();
+        assertEquals(address, getaddress);
+        String getStateCity = verifyStateCity.getText();
+        assertEquals(stateCity, getStateCity);
     }
 }
